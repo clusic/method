@@ -1,6 +1,6 @@
 {
   "name": "@clusic/method",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "The method resolver in controller of clusic",
   "repository": {
     "type": "git",
