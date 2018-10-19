@@ -44,6 +44,15 @@ exports.Middleware = function(name, ...args) {
   }
 });
 
+exports.ContextService = class ContextService {
+  constructor(ctx) {
+    this.ctx = ctx;
+    this.app = this.ctx.app;
+    this.Service = this.ctx.Service;
+    this.Logger = this.app.Logger;
+  }
+}
+
 function MakeRouterData() {
   return {
     uri: null,
