@@ -1,6 +1,6 @@
 {
   "name": "@clusic/method",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "The method resolver in controller of clusic",
   "repository": {
     "type": "git",
@@ -11,5 +11,8 @@
   "bugs": {
     "url": "https://github.com/clusic/method/issues"
   },
-  "homepage": "https://github.com/clusic/method#readme"
+  "homepage": "https://github.com/clusic/method#readme",
+  "dependencies": {
+    "reflect-metadata": "^0.1.12"
+  }
 }

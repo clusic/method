@@ -1,50 +1,16 @@
-const Route = require('koa-router');
-const GlobalRouteTree = [];
-let id = 0;
+require('reflect-metadata');
+global.CLUSIC_ROUTER_COMPONENTS = [];
 
-exports.getAllRoutes = function() {
-  return GlobalRouteTree;
-}
+exports.Methods = ['Get', 'Post', 'Put', 'Delete', 'Patch', 'Head', 'Options'];
 
-function ControllerService(ctx) {
+exports.ApplicationComponent = function ApplicationComponent(ctx) {
   this.ctx = ctx;
   this.app = this.ctx.app;
   this.Service = this.ctx.Service;
   this.Logger = this.app.Logger;
-}
-
-ControllerService.prototype.__routes__ = {};
-
-exports.ControllerService = ControllerService;
-
-exports.Controller = function(prefix) {
-  const router = {};
-  GlobalRouteTree.push(router);
-  router.__prefix__ = prefix || '/';
-  return (target, property, descriptor) => {
-    router.__routes__ = target.prototype.__routes__;
-    router.__class__ = target;
-  }
-}
-
-exports.Middleware = function(name, ...args) {
-  return (target, property, descriptor) => {
-    if (!target.__routes__[property]) target.__routes__[property] = MakeRouterData();
-    target.__routes__[property].middlewares.push({ name: name, args });
-  }
 };
 
-['Get', 'Post', 'Put', 'Delete', 'Patch', 'Head', 'Options'].forEach(method => {
-  exports[method] = function(uri) {
-    return (target, property, descriptor) => {
-      if (!target.__routes__[property]) target.__routes__[property] = MakeRouterData();
-      target.__routes__[property].uri = uri;
-      target.__routes__[property].method = method.toLowerCase();
-    }
-  }
-});
-
-exports.ContextService = class ContextService {
+exports.ContextComponent = class ContextComponent {
   constructor(ctx) {
     this.ctx = ctx;
     this.app = this.ctx.app;
@@ -53,12 +19,65 @@ exports.ContextService = class ContextService {
   }
 }
 
-function MakeRouterData() {
-  return {
-    uri: null,
-    middlewares: [],
-    id: id++,
-    method: null,
-    extra: {}
+exports.RenderMiddlewareArguments = function RenderMiddlewareArguments(object, middleware) {
+  let middle = middleware.Expression.split('.').reduce((target, property) => {
+    if (target[property]) return target[property];
+    throw new Error(`Can not find property ${property} on ${JSON.stringify(target)}`);
+  }, object);
+  if (middleware.Arguments.length) middle = middle(...middleware[n].Arguments);
+  return middle;
+}
+
+exports.Controller = function Controller(prefix = '/') {
+  return (target, propertyKey, descriptor) => {
+    if (!propertyKey && !descriptor) {
+      if (global.CLUSIC_ROUTER_COMPONENTS.indexOf(target) === -1) {
+        global.CLUSIC_ROUTER_COMPONENTS.push(target);
+      }
+      return Reflect.defineMetadata('Controller', prefix, target);
+    }
   }
 }
+
+exports.Use = function Use(name, ...args) {
+  return (target, propertyKey, descriptor) => {
+    if (!propertyKey && !descriptor) {
+      let Middlewares = Reflect.getMetadata('Use', target);
+      if (!Middlewares) Middlewares = [];
+      Middlewares.push({
+        Expression: name,
+        Arguments: args
+      });
+      return Reflect.defineMetadata('Use', Middlewares, target);
+    }
+  }
+}
+
+exports.Extra = function Extra(callback) {
+  return (target, propertyKey, descriptor) => {
+    let Properies = Reflect.getMetadata('ExtraProperies', descriptor.value);
+    if (!Properies) Properies = [];
+    Properies.push(callback);
+    return Reflect.defineMetadata('ExtraProperies', Properies, descriptor.value);
+  }
+}
+
+exports.Middleware = function Middleware(name, ...args) {
+  return (target, propertyKey, descriptor) => {
+    let Middlewares = Reflect.getMetadata('Middleware', descriptor.value);
+    if (!Middlewares) Middlewares = [];
+    Middlewares.push({
+      Expression: name,
+      Arguments: args
+    });
+    return Reflect.defineMetadata('Middleware', Middlewares, descriptor.value);
+  }
+}
+
+exports.Methods.forEach(method => {
+  exports[method] = function(path) {
+    return (target, propertyKey, descriptor) => {
+      return Reflect.defineMetadata(method, { path, property: propertyKey }, descriptor.value);
+    }
+  }
+});
