@@ -53,6 +53,14 @@ exports.Use = function Use(name, ...args) {
   }
 }
 
+exports.Order = function Order(order) {
+  return (target, propertyKey, descriptor) => {
+    if (!propertyKey && !descriptor) {
+      return Reflect.defineMetadata('Order', order, target);
+    }
+  }
+}
+
 exports.Extra = function Extra(callback) {
   return (target, propertyKey, descriptor) => {
     let Properies = Reflect.getMetadata('ExtraProperies', descriptor.value);
