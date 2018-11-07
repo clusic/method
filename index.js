@@ -1,5 +1,5 @@
 require('reflect-metadata');
-global.CLUSIC_ROUTER_COMPONENTS = [];
+if (!global.CLUSIC_ROUTER_COMPONENTS) global.CLUSIC_ROUTER_COMPONENTS = [];
 
 exports.Methods = ['Get', 'Post', 'Put', 'Delete', 'Patch', 'Head', 'Options'];
 
