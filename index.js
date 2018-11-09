@@ -28,7 +28,7 @@ exports.RenderMiddlewareArguments = function RenderMiddlewareArguments(object, m
   return middle;
 }
 
-exports.Controller = function Controller(prefix = '/') {
+exports.Controller = function Controller(prefix) {
   return (target, propertyKey, descriptor) => {
     if (!propertyKey && !descriptor) {
       if (global.CLUSIC_ROUTER_COMPONENTS.indexOf(target) === -1) {
