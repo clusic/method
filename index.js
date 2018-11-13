@@ -1,7 +1,7 @@
 require('reflect-metadata');
 if (!global.CLUSIC_ROUTER_COMPONENTS) global.CLUSIC_ROUTER_COMPONENTS = [];
 
-exports.Methods = ['Get', 'Post', 'Put', 'Delete', 'Patch', 'Head', 'Options', 'Socket'];
+exports.Methods = ['Get', 'Post', 'Put', 'Delete', 'Patch', 'Head', 'Options'];
 
 exports.ApplicationComponent = function ApplicationComponent(ctx) {
   this.ctx = ctx;
