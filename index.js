@@ -29,14 +29,15 @@ exports.RenderMiddlewareArguments = function RenderMiddlewareArguments(object, m
 }
 
 exports.Controller = function Controller(prefix) {
-  return (target, propertyKey, descriptor) => {
-    if (!propertyKey && !descriptor) {
-      if (global.CLUSIC_ROUTER_COMPONENTS.indexOf(target) === -1) {
-        global.CLUSIC_ROUTER_COMPONENTS.push(target);
-      }
-      return Reflect.defineMetadata('Controller', prefix, target);
-    }
+  if (typeof prefix === 'function') return setControllerPrefix(prefix, null);
+  return target => setControllerPrefix(target, prefix);
+}
+
+function setControllerPrefix(target, prefix) {
+  if (global.CLUSIC_ROUTER_COMPONENTS.indexOf(target) === -1) {
+    global.CLUSIC_ROUTER_COMPONENTS.push(target);
   }
+  return Reflect.defineMetadata('Controller', prefix, target);
 }
 
 exports.Use = function Use(name, ...args) {
