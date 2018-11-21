@@ -73,6 +73,7 @@ exports.Extra = function Extra(callback) {
 
 exports.Middleware = function Middleware(name, ...args) {
   return (target, propertyKey, descriptor) => {
+    if (!propertyKey && !descriptor) return exports.Use(name, ...args)(target);
     let Middlewares = Reflect.getMetadata('Middleware', descriptor.value);
     if (!Middlewares) Middlewares = [];
     Middlewares.push({
