@@ -54,6 +54,21 @@ exports.Use = function Use(name, ...args) {
   }
 }
 
+exports.Param = function Param(name, middlewareName, ...args) {
+  return (target, propertyKey, descriptor) => {
+    if (!propertyKey && !descriptor) {
+      let Params = Reflect.getMetadata('Param', target);
+      if (!Params) Params = [];
+      Params.push({
+        Name: name,
+        Expression: middlewareName,
+        Arguments: args
+      });
+      return Reflect.defineMetadata('Param', Params, target);
+    }
+  }
+}
+
 exports.Order = function Order(order) {
   return (target, propertyKey, descriptor) => {
     if (!propertyKey && !descriptor) {
